@@ -13,13 +13,15 @@ public class ReferenceTests {
 	private tikal_dev.Player _player; 
 	private tikal_dev.Move _move;
 	private tikal_dev.Tile _tile; 
+	private tikal_dev.TileData _tileData;
 	
 	@Before
 	public void setup(){
 		int[] thing = new int[] {0,0,0,0,0,0};
 		_player = new tikal_dev.Player("name");
 		_move = new tikal_dev.Move(); 
-		_tile = new tikal_dev.Tile(0, 0, thing, false); 
+		_tileData = new tikal_dev.TileData(0, 0, thing, false, true);
+		_tile = new tikal_dev.Tile(_tileData); 
 	}
 	
 	@Test

@@ -58,14 +58,17 @@ public class Menu extends JPanel
 	JButton next;
 	JButton end;
 	Player current;
-	Tile[][] _board;
-	ArrayList<Tile> gameTilesArr;
-	Tile[] gameTiles;
-	Tile nextToPlace;
+	//Tile[][] _board;
+	TileData[] gameTileData;
+	TileData blank;
+	Tile previewTile;
 	
-	public Menu(Player playerOne , Player playerTwo , Move move, Tile[][] Board)
+	public Menu(Player playerOne , Player playerTwo , Move move /*Tile[][] Board*/)
 	{
-		_board = Board;
+		//_board = Board;
+		int[] temp = new int[]{ 0, 0, 0, 0, 0, 0 };
+		blank = new TileData(0,0,temp , false, true);
+		previewTile = new Tile(blank);
 		_playerOne = playerOne;
 		_playerTwo = playerTwo;
 		current = _playerOne;
@@ -73,7 +76,7 @@ public class Menu extends JPanel
 		_move.setCurrentPlayer(current);
 		
 		setup();
-		CreateTiles();
+		CreateTileData();
 	}
 	
 	
@@ -241,6 +244,8 @@ public class Menu extends JPanel
 		tileImg.setSize(100,100);
 		preview.add(tileImg);
 		tileImg.setBounds(100 , 0, 100, 100);
+		//tileImg.add(previewTile);
+		//previewTile.setVisible(false);
 		
 		//Setting up the 'Rotate' Buttons
 			//Clockwise Rotation
@@ -305,16 +310,17 @@ public class Menu extends JPanel
 			
 				if(_move.getCurrentTilePlaced() < 40)//checks if there are tiles remaining to be placed
 				{
-					if(nextToPlace == null)//checks to see if a tile has already been drawn but not placed
+					if(previewTile.tileData == blank)//checks to see if a tile has already been drawn but not placed
 					{
 						//pulls a tile from the tile[] and sets if in the preview for rotation and placement
 						//and updates move to the placing a tile state
 						UpdateInstructions(1);
-						nextToPlace = gameTiles[_move.getCurrentTilePlaced()];
-						tileImg.add(nextToPlace);
-						nextToPlace.RotateClockwise();
+						previewTile.setTileData(gameTileData[_move.getCurrentTilePlaced()]);
+						previewTile.RotateClockwise();
+						previewTile.setVisible(true);
+						tileImg.add(previewTile);
 						tileImg.repaint();
-						_move.setNexttoPlace(nextToPlace);
+						_move.setNexttoPlace(previewTile);
 						_move.setMoves(1);
 						//System.out.println("Placed a tile!");
 						_move.setCurrentTilePlaced(_move.getCurrentTilePlaced()+1);
@@ -346,7 +352,7 @@ public class Menu extends JPanel
 	
 	public void PlacePyramidClick(MouseEvent e)
 	{
-		if(nextToPlace == null)//checks to make sure you don't have a tile pending placement
+		if(previewTile.tileData == blank)//checks to make sure you don't have a tile pending placement
 		{
 			if(_move.getPyramidsThisTurn() < 2)//checks how many pyramids already placed this turn
 			{
@@ -377,7 +383,7 @@ public class Menu extends JPanel
 	
 	public void PlaceExplorerClick(MouseEvent e) 
 	{
-		if(nextToPlace == null)//checks to make sure there is no tile pending placement
+		if(previewTile.tileData == blank)//checks to make sure there is no tile pending placement
 		{
 			if(_move.getCpActionPoints() > 0)//checks action points
 			{
@@ -389,16 +395,16 @@ public class Menu extends JPanel
 						_move.setAvailableExplorer(_move.getAvailableExplorer() - 1);
 						_move.setCpActionPoints(_move.getCpActionPoints()-1);
 						this.RefreshStats();
-						//System.out.println("Placed an Explorer!");
+						System.out.println("Placed an Explorer!");
 						//if current player is Player 1, increment number of explorers for him on First Tile
 						if (_move.getCurrentPlayer().getName()=="P1")
 						{
-							_move.getFirstTile().setP1(_move.getFirstTile().getP1()+1);
+							_move.getFirstTile().tileData.SetExplorer(0, _move.getFirstTile().getTileData().GetExplorers(0)+1);
 						}
 						//if current player is Player 2, increment number of explorers for him on First Tile
 						else if (_move.getCurrentPlayer().getName()=="P2")
 						{
-							_move.getFirstTile().setP2(_move.getFirstTile().getP2()+1);
+							_move.getFirstTile().tileData.SetExplorer(1, _move.getFirstTile().getTileData().GetExplorers(1)+1);
 						}
 					}
 					else
@@ -425,7 +431,7 @@ public class Menu extends JPanel
 	
 	public void MoveExplorerClick(MouseEvent e) 
 	{
-		if(nextToPlace == null)//checks to see if a tile is pending placement
+		if(previewTile.tileData == blank)//checks to see if a tile is pending placement
 		{
 			//updates move to the moveing an explorer state
 			UpdateInstructions(2);
@@ -440,12 +446,12 @@ public class Menu extends JPanel
 	
 	public void ClockwiseClick(MouseEvent e) 
 	{
-		if(nextToPlace != null)//checks to make sure there is a tile pending placement
+		if(previewTile.tileData != blank)//checks to make sure there is a tile pending placement
 		{
 			//rotates the tile that is pending placement 
-			nextToPlace.RotateClockwise();
+			previewTile.RotateClockwise();
 			tileImg.repaint();
-			_move.setNexttoPlace(nextToPlace);
+			_move.setNexttoPlace(previewTile);
 			//System.out.println("Rotated clockwise!");
 		}
 		else
@@ -456,11 +462,11 @@ public class Menu extends JPanel
 	
 	public void CounterClick(MouseEvent e) 
 	{
-		if(nextToPlace != null)//checks to make sure there is a tile pendinig placement
+		if(previewTile.tileData != blank)//checks to make sure there is a tile pendinig placement
 		{
-			nextToPlace.RotateCounterClockwise();
+			previewTile.RotateCounterClockwise();
 			tileImg.repaint();
-			_move.setNexttoPlace(nextToPlace);
+			_move.setNexttoPlace(previewTile);
 			//System.out.println("Rotated counterclockwise!");
 		}
 		else
@@ -471,12 +477,12 @@ public class Menu extends JPanel
 	
 	public void NextClick(MouseEvent e) 
 	{
-		if(nextToPlace == null)//checks if there is a tile pending placement
+		if(previewTile.tileData == blank)//checks if there is a tile pending placement
 		{
 			if(_move.getCurrentTilePlaced() == 40)//checks if all tiles have been placed
 			{
 				//ends the game and calculates score
-				score();
+				//score();
 			}
 			else if(current == _playerOne)//checks if the current player is player one
 			{
@@ -508,7 +514,7 @@ public class Menu extends JPanel
 	public void EndClick(MouseEvent e)
 	{
 		//ends the game and calculates score
-		score();
+		//score();
 	}
 	//end of button handling methods
 	
@@ -516,7 +522,9 @@ public class Menu extends JPanel
 	public void Clear()
 	{
 		//clears the preview after the tile is placed
-		nextToPlace = null;
+		//previewTile.setVisible(false);\
+		previewTile.setTileData(blank);
+		tileImg.remove(previewTile);
 		tileImg.repaint();
 	}
 	
@@ -556,36 +564,34 @@ public class Menu extends JPanel
 	
 
 	//Method that creates the  terrain tiles for the game
-		public void CreateTiles()
+		public void CreateTileData()
 		{
-			gameTiles = new Tile[40];
-			gameTilesArr = new ArrayList<Tile>();
-			Tile Cur;
+			gameTileData = new TileData[40];
+			ArrayList<TileData> gameTileDataTemp = new ArrayList<TileData>();
+			TileData Cur;
 			
 			for(int i = 0; i < 40; i++)
 			{
 				if(i < 8)
 				{
 					//creates 8 tiles with pyramid bases
-					Cur = new Tile(0 , 0 , RandomTilePaths(), true);
-					Cur.SetNonEmpty();
-					gameTilesArr.add(Cur);
+					Cur = new TileData(0 , 0 , RandomTilePaths(), true, false);
+					gameTileDataTemp.add(Cur);
 				}
 				else
 				{
 					//creates the rest of the tiles without pyramid bases
-					Cur = new Tile(0 , 0 , RandomTilePaths(), false);
-					Cur.SetNonEmpty();
-					gameTilesArr.add(Cur);
+					Cur = new TileData(0 , 0 , RandomTilePaths(),false, false);
+					gameTileDataTemp.add(Cur);
 				}
 			}
 			
 			//shuffles the array so the tiles are drawn in random order
-			Collections.shuffle(gameTilesArr);
+			Collections.shuffle(gameTileDataTemp);
 			
 			for(int w = 0; w < 40; w++)
 			{
-				gameTiles[w] = gameTilesArr.get(w);
+				gameTileData[w] = gameTileDataTemp.get(w);
 			}
 		}
 		
@@ -616,7 +622,7 @@ public class Menu extends JPanel
 			return paths;
 		}
 		//method that calculates scores at game end
-		public void score(){
+		/*public void score(){
 			for(int x =0;x < 8; x++ )
 				for(int y = 0;y < 5; y++){
 					Tile temp = _board[x][y];
@@ -639,7 +645,7 @@ public class Menu extends JPanel
 					else; 
 				}
 			JOptionPane.showMessageDialog(null, "Player 1 score: "+ _playerOne.getScore()+" Player 2 score: " + _playerTwo.getScore());
-		}
+		}*/
 
 
 }

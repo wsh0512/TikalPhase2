@@ -2,10 +2,8 @@
 
 package tikal_dev;
 
-import java.awt.Color;
-import javax.swing.ImageIcon;
+
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 
 /**
@@ -17,37 +15,45 @@ public class Tile extends javax.swing.JPanel {
     
     //tile background
     JLabel BG;
-    
-    //Pyramid Initialized to Null
-    Pyramid PM=null;
-    
-    //Location of the Tile
-    int LocX,LocY;
-    
-    //Size of path in each six directions;
-    int[] paths;
-    
-    
-    //Values of Player Explorers on this tile
-    int P1E;
-    int P2E;
-    
-    
-    
-    public Tile(int X, int Y, int[]P, boolean PM){
-        LocX = X;
-        LocY = Y;
-        paths = P;
-        P1E = 0;
-        P2E = 0;
-        
+    TileData tileData;
+     
+    public Tile(TileData TD)
+    {
+    	tileData = TD;
         this.setSize(100, 100);
-        initComponents(PM);
+        initComponents(tileData._PMV);
         UpdatePaths();
     }
     
+    public void setTileData(TileData TD)
+    {
+    	tileData = TD;
+    	if(!tileData._empty)
+    	{
+    		SetNonEmpty();
+    	}
+    	initComponents(tileData._PMV);
+    	UpdatePaths();
+    }
+    
+    public TileData getTileData()
+    {
+    	return tileData;
+    }
+    
+    public void RotateClockwise()
+    {
+    	tileData.RotateClockwise();
+    	UpdatePaths();
+    }
+    
+    public void RotateCounterClockwise()
+    {
+    	tileData.RotateCounterClockwise();
+    	UpdatePaths();
+    }
     //Builds the GUI and configuration
-	private void initComponents(boolean PMV) {
+	public void initComponents(boolean PMV) {
 		
 		//Initialize Path Components
         Bottom = new javax.swing.JLabel();
@@ -143,11 +149,11 @@ public class Tile extends javax.swing.JPanel {
         P2_Ind.setBounds(60, 40, 30, 20);
 
         //Initialize the Pyramid if the boolean parameter PMV is set to true (has pyramid)
-        if (PMV){
+        if (tileData._PMV){
         	//Initialize Pyramid Object
-            PM = new Pyramid(LocX,LocY,0);
-        	add(PM);
-        	PM.setBounds(28, 22, 45, 50);       	
+            tileData.PM = new Pyramid(tileData.LocX,tileData.LocY,0);
+        	add(tileData.PM);
+        	tileData.PM.setBounds(28, 22, 45, 50);       	
         }
         
         //
@@ -181,7 +187,7 @@ public class Tile extends javax.swing.JPanel {
 		//		-later a path of value 3 (purple)
 		
 		for (int i = 0; i<6; i++){
-			int cur = paths[i];
+			int cur = tileData.getPathValue(i);
 			switch(i){
 				case 0:
 					//NORTH
@@ -260,74 +266,6 @@ public class Tile extends javax.swing.JPanel {
 			}
 		}
 		repaint();
-	}
-	
-	//Rotates the wall array counter clockwise and updates the visuals
-	public void RotateClockwise(){
-		int temp = paths[5];
-		paths[5]=paths[4];
-		paths[4]=paths[3];
-		paths[3]=paths[2];
-		paths[2]=paths[1];
-		paths[1]=paths[0];
-		paths[0]=temp;
-		UpdatePaths();
-		
-	}
-	
-	//Rotates the wall array counter clockwise and updates the visuals
-	public void RotateCounterClockwise(){
-		int temp = paths[0];
-		paths[0] = paths[1];
-		paths[1] = paths[2];
-		paths[2] = paths[3];
-		paths[3] = paths[4];
-		paths[4] = paths[5];
-		paths[5] = temp;
-		UpdatePaths();
-		
-	}
-	
-	//Gets the current value of Player 1s explorers on this tile.
- 	public int getP1(){
-		return P1E;
-	}
-	
-	//Sets the current value of Player 1s explorers on this tile.
-	public void setP1(int val){
-		P1E =val;
-		if (P1E==0){
-			P1_Ind.setText("");
-		}
-		else{
-			P1_Ind.setText(String.valueOf(P1E));
-		}
-		
-	}
-
-	//Gets the current value of Player 2s explorers on this tile
-	public int getP2(){
-		return P2E;
-	}
-	
-	//Sets the current value of Player 2s explorers on this tile.
-	public void setP2(int val){
-		P2E = val;
-		if (P2E==0){
-			P2_Ind.setText("");
-		}
-		else{
-			P2_Ind.setText(String.valueOf(P2E));
-		}
-		
-	}
-	
-	public void setX(int x){
-		LocX=x;
-	}
-	
-	public void setY(int y){
-		LocY=y;
 	}
 	
 	public void SetNonEmpty(){
