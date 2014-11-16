@@ -37,7 +37,7 @@ public class Game {
 	public Game() 
 	{
 		// Creates a new 2d storage array for tile data [x][y]
-		BoardData = new TileData[8][5];
+		BoardData = new TileData[8][];
 		InitBoardData();
 		_move = new Move();
 		_player1 = new Player("P1");
@@ -53,12 +53,27 @@ public class Game {
 		// Adding columns in t
 		for (int x = 0; x < 8; x++) 
 		{
-			
-			for(int y = 0; y < 5; y++)
+			if(x%2 == 0)
 			{
-				int[] none = new int[] {0,0,0,0,0,0};
-				TileData unplaced = new TileData(x , y , none , false , true);
-				BoardData[x][y] = unplaced;
+				TileData[] col = new TileData[5];
+				for(int y = 0; y < 5; y++)
+				{
+					int[] none = new int[] {0,0,0,0,0,0};
+					TileData unplaced = new TileData(x , y , none , false , true);
+					col[y] = unplaced;
+				}
+				BoardData[x] = col;
+			}
+			else
+			{
+				TileData[] col = new TileData[6];
+				for(int y = 0; y < 6; y++)
+				{
+					int[] none = new int[] {0,0,0,0,0,0};
+					TileData unplaced = new TileData(x , y , none , false , true);
+					col[y] = unplaced;
+				}
+				BoardData[x] = col;
 			}
 
 		}

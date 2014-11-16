@@ -1,8 +1,11 @@
 package tikal_dev;
 
+import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.LayoutManager;
 import java.awt.event.MouseEvent;
 
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -10,6 +13,7 @@ import javax.swing.JPanel;
 public class GUI 
 {
 	Tile[][] board;
+	Tile[] boardColumn;
 	TileData[][] _data;
 	
 	JFrame TF;
@@ -23,7 +27,7 @@ public class GUI
 	
 	public GUI(Menu MU , TileData[][] data , Move move)
 	{
-		board = new Tile[8][5];
+		board = new Tile[8][];
 		_data = data;
 		_menu = MU;
 		_move = move;
@@ -37,7 +41,7 @@ public class GUI
 
 		TF = new JFrame();
 		TF.setResizable(false);
-		TF.setSize(1100, 600);
+		TF.setSize(1100, 800);
 		TF.setLayout(null);
 		TF.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		
@@ -47,46 +51,77 @@ public class GUI
 		GB.setBackground(java.awt.Color.BLACK);
 		GB.setLayout(null);
 		TF.add(GB);
-		GB.setBounds(0, 0, 800, 600);
+		GB.setBounds(0, 0, 800, 800);
 		
 		// Add Menu Object
 		TF.add(_menu);
-		_menu.setBounds(800, 0, 300, 600);
+		_menu.setBounds(800, 100, 300, 600);
 		
 		// Adding columns in t
 		for (int x = 0; x < 8; x++) 
 		{
 			TileColumn TH = new TileColumn();
-			TH.setLayout(new GridLayout(5,1));
-			for(int i = 0; i < 5; i++)
+			
+			if(x%2 == 0)
 			{
-				JPanel temp = new JPanel();
-				temp.setSize(100,100);
-				temp.setOpaque(false);
-				TH.add(temp);
+				TH.setLayout(new BoxLayout(TH, BoxLayout.Y_AXIS));
+				TH.setBounds((x * 100) - (x * 10), 100, 100, 600);
+				boardColumn = new Tile[5];
+				for(int y = 0; y < 5; y++)
+				{
+					
+					JPanel temp = new JPanel();
+					temp.setSize(100,100);
+					temp.setOpaque(false);
+					TH.add(temp);
+					
+					Tile Cur = new Tile(_data[x][y]);
+					Cur.setMinimumSize(new Dimension(100, 100));
+					boardColumn[y] = Cur;
+					JPanel SPA = (JPanel)TH.getComponent(y);
+					SPA.add(boardColumn[y]);
+					boardColumn[y].addMouseListener(new java.awt.event.MouseAdapter() {
+						public void mousePressed(MouseEvent e) {
+							HandleClicks(e);
+						}
+					});
+				}
+				
+				board[x] = boardColumn;
+				GB.add(TH);//adds the tile holder to the GUI
+				
 			}
-
-			GB.add(TH);//adds the tile holder to the GUI
-
-			if (x % 2 == 0) {//used to create the shifted look of the board
-				TH.setBounds((x * 100) - (x * 10), 0, 100, 500);
-			} 
-			else 
+			else
 			{
-				TH.setBounds((x * 100) - (x * 10), 50, 100, 500);
+				TH.setSize(800, 100);
+				TH.setLayout(new BoxLayout(TH, BoxLayout.Y_AXIS));
+				TH.setBounds((x * 100) - (x * 10), 50, 100, 700);
+				boardColumn = new Tile[6];
+				for(int y = 0; y < 6; y++)
+				{
+					JPanel temp = new JPanel();
+					temp.setSize(100,100);
+					temp.setOpaque(false);
+					TH.add(temp);
+					
+					Tile Cur = new Tile(_data[x][y]);
+					Cur.setMinimumSize(new Dimension(100, 100));
+					boardColumn[y] = Cur;
+					JPanel SPA = (JPanel)TH.getComponent(y);
+					SPA.add(boardColumn[y]);
+					boardColumn[y].addMouseListener(new java.awt.event.MouseAdapter() {
+						public void mousePressed(MouseEvent e) {
+							HandleClicks(e);
+						}
+					});
+				}
+				
+				board[x] = boardColumn;
+				GB.add(TH);//adds the tile holder to the GUI
+	
 			}
-			for (int y = 0; y < 5; y++) 
-			{
-				Tile Cur = new Tile(_data[x][y]); 
-				board[x][y] = Cur;
-				JPanel SPA = (JPanel)TH.getComponent(y);
-				SPA.add(board[x][y]);
-				board[x][y].addMouseListener(new java.awt.event.MouseAdapter() {
-					public void mousePressed(MouseEvent e) {
-						HandleClicks(e);
-					}
-				});
-			}
+			
+			
 		}
 		TF.setVisible(true);
 	}
