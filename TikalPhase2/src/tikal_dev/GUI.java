@@ -11,7 +11,7 @@ public class GUI
 {
 	Tile[][] board;
 	TileData[][] _data;
-	
+	Player[] _player;
 	JFrame TF;
 	JPanel GB;
 	Menu _menu;
@@ -21,8 +21,9 @@ public class GUI
 	int y[]=new int[40];
 	int current;
 	
-	public GUI(Menu MU , TileData[][] data , Move move)
+	public GUI(Menu MU , TileData[][] data , Move move, Player[] player)
 	{
+		_player = player;
 		board = new Tile[8][5];
 		_data = data;
 		_menu = MU;
@@ -184,12 +185,12 @@ public class GUI
 						//checks if this is the first or second tile in the move
 						if (_move.getTileClick1()==null){
 							_move.setTileClick1(T);
-							
 							//checks if the player has an explorer on the selected tile to move
-							if((_move.getCurrentPlayer()==_menu._playerOne && _move.getTileClick1().tileData.GetExplorers(0)==0)||(_move.getCurrentPlayer()==_menu._playerTwo && _move.getTileClick1().tileData.GetExplorers(1)==0)){
+							if((_move.getTileClick1().tileData.GetExplorers(_move.getCurrentPlayer().getID())==0)){
 								JOptionPane.showMessageDialog(null, "No explorers to move.");
 								_move.reset();
 								_menu.RefreshStats();
+								
 							}
 							else
 							{
@@ -205,43 +206,15 @@ public class GUI
 							//makes sure there is a path from the first to the second tile
 							if (cost>0){
 								//checks which player is doing the move
-								if (_move.getCurrentPlayer().getName()=="P1"){
-									//checks that the player has enough action points to make the move and that they have an explorer
-									if((_move.getTileClick1().tileData.GetExplorers(0)>0)&&(_move.getCurrentPlayer().getActionPoints()>=cost)){
-										 MoveExplorer(cost);
-										 
-									}
-									else
-									{
-										JOptionPane.showMessageDialog(null, "Not enough Action Points.");
-										_move.reset();
-										_menu.RefreshStats();
-									}
-								}
-								else if (_move.getCurrentPlayer().getName()=="P2"){
-									//checks that the player has enough action points to make the move and that they have an explorer
-									if((_move.getTileClick1().tileData.GetExplorers(1)>0)&&(_move.getCurrentPlayer().getActionPoints()>=cost)){
-										 MoveExplorer(cost);
-									}
-									else
-									{
-										JOptionPane.showMessageDialog(null, "Not enough Action Points.");
-										_move.reset();
-										_menu.RefreshStats();
-									}
-								}
-								else{
-									JOptionPane.showMessageDialog(null, "Unknown player defined.");
-									_move.reset();
-								}
+								//checks that the player has enough action points to make the move and that they have an explorer
+								MoveExplorer(cost);
 							}
 							else{
-								JOptionPane.showMessageDialog(null, "Cannot move this explorer.");
+								JOptionPane.showMessageDialog(null, "Not enough Action Points.");
 								_move.reset();
 								_menu.RefreshStats();
 							}
 						}
-						
 					break;
 					
 					//the tile is selected as the destination for a pyramid upgrade
@@ -258,18 +231,13 @@ public class GUI
 		    					if(_move.getPyrimidNumber(0) > 0)
 		    					{
 		    						//checks that the player making the placement has the most explorers on the tile
-			    					if(_move.getCurrentPlayer().equals(_menu._playerOne) && T.tileData.GetExplorers(1) > T.tileData.GetExplorers(2)){
+			    					if(_move.getCurrentPlayer().getID() == search_large_ID(T.tileData, _player.length) 
+			    					&& T.tileData.GetExplorers(search_large_ID(T.tileData, _player.length)) != 0){
 			    						T.tileData.PM.setValue(1);
 			    						_move.setCpActionPoints(_move.getCpActionPoints()-1);
 			    						_move.setPyrimidNumber(0, _move.getPyrimidNumber(0)-1);
 			    						_move.setPyramidsThisTurn(_move.getPyramidsThisTurn()+1);
 			    						
-			    					}
-			    					else if (_move.getCurrentPlayer().equals(_menu._playerTwo) && T.tileData.GetExplorers(1) < T.tileData.GetExplorers(2)){
-			    						T.tileData.PM.setValue(1);
-			    						_move.setCpActionPoints(_move.getCpActionPoints()-1);
-			    						_move.setPyrimidNumber(0, _move.getPyrimidNumber(0)-1);
-			    						_move.setPyramidsThisTurn(_move.getPyramidsThisTurn()+1);
 			    					}
 			    					else JOptionPane.showMessageDialog(null, "Not enough Explores here.");
 		    					}
@@ -280,13 +248,8 @@ public class GUI
 		    				case 1:
 		    					if(_move.getPyrimidNumber(1) > 0 )
 		    					{
-			    					if(_move.getCurrentPlayer().equals(_menu._playerOne) && T.tileData.GetExplorers(1) > T.tileData.GetExplorers(2)){
-			    						T.tileData.PM.setValue(2);
-			    						_move.setCpActionPoints(_move.getCpActionPoints()-1);
-			    						_move.setPyrimidNumber(1, _move.getPyrimidNumber(1)-1);
-			    						_move.setPyramidsThisTurn(_move.getPyramidsThisTurn()+1);
-			    					}
-			    					else if (_move.getCurrentPlayer().equals(_menu._playerTwo) && T.tileData.GetExplorers(1) < T.tileData.GetExplorers(2)){
+			    					if(_move.getCurrentPlayer().getID() == search_large_ID(T.tileData, _player.length) 
+			    					&& T.tileData.GetExplorers(search_large_ID(T.tileData, _player.length)) != 0){
 			    						T.tileData.PM.setValue(2);
 			    						_move.setCpActionPoints(_move.getCpActionPoints()-1);
 			    						_move.setPyrimidNumber(1, _move.getPyrimidNumber(1)-1);
@@ -301,13 +264,8 @@ public class GUI
 		    				case 2:
 		    					if(_move.getPyrimidNumber(2) > 0)
 		    					{
-			    					if(_move.getCurrentPlayer().equals(_menu._playerOne) && T.tileData.GetExplorers(1) > T.tileData.GetExplorers(2)){
-			    						T.tileData.PM.setValue(3);
-			    						_move.setCpActionPoints(_move.getCpActionPoints()-1);
-			    						_move.setPyrimidNumber(2, _move.getPyrimidNumber(2)-1);
-			    						_move.setPyramidsThisTurn(_move.getPyramidsThisTurn()+1);
-			    					}
-			    					else if (_move.getCurrentPlayer().equals(_menu._playerTwo) && T.tileData.GetExplorers(1) < T.tileData.GetExplorers(2)){
+			    					if(_move.getCurrentPlayer().getID() == search_large_ID(T.tileData, _player.length) 
+			    					&& T.tileData.GetExplorers(search_large_ID(T.tileData, _player.length)) != 0){
 			    						T.tileData.PM.setValue(3);
 			    						_move.setCpActionPoints(_move.getCpActionPoints()-1);
 			    						_move.setPyrimidNumber(2, _move.getPyrimidNumber(2)-1);
@@ -322,13 +280,8 @@ public class GUI
 		    				case 3:
 		    					if(_move.getPyrimidNumber(3) > 0)
 		    					{
-			    					if(_move.getCurrentPlayer().equals(_menu._playerOne) && T.tileData.GetExplorers(1) > T.tileData.GetExplorers(2)){
-			    						T.tileData.PM.setValue(4);
-			    						_move.setCpActionPoints(_move.getCpActionPoints()-1);
-			    						_move.setPyrimidNumber(3, _move.getPyrimidNumber(3)-1);
-			    						_move.setPyramidsThisTurn(_move.getPyramidsThisTurn()+1);
-			    					}
-			    					else if (_move.getCurrentPlayer().equals(_menu._playerTwo) && T.tileData.GetExplorers(1) < T.tileData.GetExplorers(2)){
+			    					if(_move.getCurrentPlayer().getID() == search_large_ID(T.tileData, _player.length) 
+			    					&& T.tileData.GetExplorers(search_large_ID(T.tileData, _player.length)) != 0){
 			    						T.tileData.PM.setValue(4);
 			    						_move.setCpActionPoints(_move.getCpActionPoints()-1);
 			    						_move.setPyrimidNumber(3, _move.getPyrimidNumber(3)-1);
@@ -346,6 +299,7 @@ public class GUI
 		    					
 		    					break;
 						}
+						
 						_move.reset();
 						break;
 				}
@@ -489,8 +443,8 @@ public class GUI
 			public void MoveExplorer(int cost){
 				
 				if (_move.getCurrentPlayer().getName()=="P1"){
-					_move.getTileClick1().tileData.SetExplorer( 0 , (_move.getTileClick1().tileData.GetExplorers(0)-1));
-					_move.getTileClick1().tileData.SetExplorer( 0 , (_move.getTileClick1().tileData.GetExplorers(0)+1));
+					_move.getTileClick1().tileData.SetExplorer( 1 , (_move.getTileClick1().tileData.GetExplorers(1)-1));
+					_move.getTileClick1().tileData.SetExplorer( 1 , (_move.getTileClick1().tileData.GetExplorers(1)+1));
 					_move.getCurrentPlayer().setActionPoints(_move.getCurrentPlayer().getActionPoints()-cost);
 					_move.reset();
 					_menu.RefreshStats();
@@ -507,5 +461,16 @@ public class GUI
 				}
 				
 				
+			}
+			public int search_large_ID(TileData T, int size){
+				int large_ID = 0;
+				int large = T.GetExplorers(0);
+				for(int i=0;i< size;i++){
+					if(large < T.GetExplorers(i)){
+						large_ID = i;
+						large = T.GetExplorers(i);
+					}
+				}
+				return large_ID;
 			}
 }

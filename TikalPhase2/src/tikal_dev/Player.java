@@ -6,7 +6,9 @@ public class Player {
 	private int _AvailableExplores;
 	private int _Score;
 	private Tile _Next_to_place;
-	public Player(String name){
+	private int _ID;
+	public Player(String name, int id){
+		_ID = id;
 		_Name = name;
 		_ActionPoints = 8;
 		_AvailableExplores = 10;
@@ -44,5 +46,8 @@ public class Player {
 	}
 	public void setScore(int val){
 		_Score = val;
+	}
+	public int getID(){
+		return _ID;
 	}
 }

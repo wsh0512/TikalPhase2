@@ -32,20 +32,22 @@ public class Game {
 	JFrame TF;
 	JPanel MN;
 	ArrayList<JPanel> THA = new ArrayList<JPanel>();
-	
+	Player[] _player;
 
-	public Game() 
+	public Game(String args[]) 
 	{
 		// Creates a new 2d storage array for tile data [x][y]
 		BoardData = new TileData[8][5];
 		InitBoardData();
 		_move = new Move();
-		_player1 = new Player("P1");
-		_player2 = new Player("P2");
-		MU = new Menu(_player1, _player2, _move);
-		_GUI = new GUI(MU , BoardData , _move);
-		_move.setCurrentPlayer(_player1);
-	}
+		_player = new Player[args.length];
+		for(int i = 0; i < args.length; i++){
+			_player[i] = new Player(args[i],i);
+		}
+		_move.setCurrentPlayer(_player[0]);
+		MU = new Menu(_player, _move, BoardData);
+		_GUI = new GUI(MU , BoardData , _move, _player);
+		}
 
 	public void InitBoardData() 
 	{
@@ -66,11 +68,11 @@ public class Game {
 
 	
 		
-	public static void main(String args[]) {
+	public static void main(final String args[]) {
 
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				new Game();
+				new Game(args);
 			}
 		});
 	}

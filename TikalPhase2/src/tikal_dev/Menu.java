@@ -24,8 +24,7 @@ import javax.swing.SwingConstants;
 
 public class Menu extends JPanel
 {
-	Player _playerOne;
-	Player _playerTwo;
+	Player[] _player;
 	Move _move;
 	
 	JPanel stats;
@@ -62,19 +61,21 @@ public class Menu extends JPanel
 	TileData[] gameTileData;
 	TileData blank;
 	Tile previewTile;
+	TileData[][] _BoardData;
 	
-	public Menu(Player playerOne , Player playerTwo , Move move /*Tile[][] Board*/)
+	public Menu(Player[] player , Move move ,TileData[][] _boardData/*Tile[][] Board*/)
 	{
 		//_board = Board;
 		int[] temp = new int[]{ 0, 0, 0, 0, 0, 0 };
 		blank = new TileData(0,0,temp , false, true);
 		previewTile = new Tile(blank);
-		_playerOne = playerOne;
-		_playerTwo = playerTwo;
-		current = _playerOne;
+		for(int i=0; i < player.length;i++ ){
+			_player[i] = player[i];
+		}
+		current = _player[0];
 		_move = move;
 		_move.setCurrentPlayer(current);
-		
+		_BoardData = _boardData;
 		setup();
 		CreateTileData();
 	}
@@ -482,20 +483,12 @@ public class Menu extends JPanel
 			if(_move.getCurrentTilePlaced() == 40)//checks if all tiles have been placed
 			{
 				//ends the game and calculates score
-				//score();
-			}
-			else if(current == _playerOne)//checks if the current player is player one
-			{
-				//changes the player
-				current = _playerTwo;
-				_move.setCpActionPoints(8);
-				_move.setTilesThisTurn(0);
-				_move.setPyramidsThisTurn(0);
+				score();
 			}
 			else
 			{
-				//changes the player
-				current = _playerOne;
+			//changes the player
+				current = _player[(current.getID()+1)%_player.length];
 				_move.setCpActionPoints(8);
 				_move.setTilesThisTurn(0);
 				_move.setPyramidsThisTurn(0);
@@ -621,31 +614,40 @@ public class Menu extends JPanel
 			
 			return paths;
 		}
-		//method that calculates scores at game end
-		/*public void score(){
+		public void score(){
 			for(int x =0;x < 8; x++ )
 				for(int y = 0;y < 5; y++){
-					Tile temp = _board[x][y];
-					if(temp.P1E > temp.P2E){//checks who has more explorers on a tile
-						if(temp.PM == null)//checks if there is a pyramid on the tile being scored
-							_playerOne.setScore(_playerOne.getScore()+1);
-						else if(temp.PM.getValue() >0)//checks the value the pyramid on the tile bing scored
-							_playerOne.setScore(_playerOne.getScore()+temp.PM.getValue());
-						else 
-							_playerOne.setScore(_playerOne.getScore()+1);
+					TileData temp = _BoardData[x][y];
+					int large_ID = 0;
+					int large = temp.GetExplorers(0);
+					for(int i = 0;i< _player.length;i++){
+						if(large < temp.GetExplorers(i)){
+							large_ID = i;
+							large = temp.GetExplorers(i);
+						}
 					}
-					else if(temp.P2E > temp.P1E){//checks who has more explorers on a tile
-						if(temp.PM == null)//checks if there is a pyramid on the tile bing scored
-							_playerTwo.setScore(_playerTwo.getScore()+1);
-						else if(temp.PM.getValue() >0)//checks the value of the pyramid on the tile being scored
-							_playerTwo.setScore(_playerTwo.getScore()+temp.PM.getValue());
-						else 
-							_playerTwo.setScore(_playerTwo.getScore()+1);
-					}
-					else; 
+					//System.out.println(large_ID+"\n"+_player[large_ID].getScore());
+					if(temp.PM == null && large != 0)//checks if there is a pyramid on the tile being scored
+						_player[large_ID].setScore(_player[large_ID].getScore()+1);
+					else if(temp.PM == null);
+					else if(temp.PM.getValue() >0)//checks the value the pyramid on the tile bing scored
+						_player[large_ID].setScore(_player[large_ID].getScore()+temp.PM.getValue());
+					else;
+						//System.out.println(large_ID+"\n"+_player[large_ID].getScore());
+ 							
 				}
-			JOptionPane.showMessageDialog(null, "Player 1 score: "+ _playerOne.getScore()+" Player 2 score: " + _playerTwo.getScore());
-		}*/
+			JOptionPane.showMessageDialog(null, Sostring());
+		}
+		
+		public String Sostring() {
+		    String s = "";
+		    for(int i =_player.length;i>0;i--){
+		    	s = "Player "+i+ " scroe: " +_player[i-1].getScore()+"\n"+s;
+		    }
+		    //System.out.println(s);
+		    return s;
+		 }
+
 
 
 }

@@ -16,9 +16,6 @@ public class TileData {
     
     
     //Values of Player Explorers on this tile
-    int P1E;
-    int P2E;
-    
     int[] explorers;
     
     boolean _empty;
@@ -30,8 +27,6 @@ public class TileData {
         _paths = paths;
         _PMV = PMV;
         _empty = empty;
-        P1E = 0;
-        P2E = 0;
         explorers = new int[2];
 	}
 	

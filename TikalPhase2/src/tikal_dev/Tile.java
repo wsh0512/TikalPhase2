@@ -62,11 +62,11 @@ public class Tile extends javax.swing.JPanel {
         LTop = new javax.swing.JLabel();
         RBottom = new javax.swing.JLabel();
         LBottom = new javax.swing.JLabel();
-        
+        P = new JLabel[this.tileData.explorers.length];
         //Initialize Player Explorer Counts
-        P1_Ind = new javax.swing.JLabel();
-        P2_Ind = new javax.swing.JLabel();
-        
+        for(int i =0; i <this.tileData.explorers.length;i++){
+        	P[i] = new javax.swing.JLabel();
+        }       
         //Initialize Background Image
         Background = new javax.swing.JLabel();
 
@@ -135,18 +135,13 @@ public class Tile extends javax.swing.JPanel {
         //
 
         //Initialize  Player 1 counter
-        P1_Ind.setForeground(new java.awt.Color(255, 255, 255));
-        P1_Ind.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        P1_Ind.setText("");
-        add(P1_Ind);
-        P1_Ind.setBounds(15, 40, 20, 20);
-
-        //Initialize Player 2 counter
-        P2_Ind.setForeground(new java.awt.Color(255, 255, 255));
-        P2_Ind.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        P2_Ind.setText("");
-        add(P2_Ind);
-        P2_Ind.setBounds(60, 40, 30, 20);
+        for(int i =0;i<P.length;i++){
+        	P[i].setForeground(new java.awt.Color(255, 255, 255));
+        	P[i].setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        	P[i].setText("0");
+        	add(P[i]);
+        	P[i].setBounds(5+10*i, 40, 20, 20);
+        }
 
         //Initialize the Pyramid if the boolean parameter PMV is set to true (has pyramid)
         if (tileData._PMV){
@@ -272,6 +267,15 @@ public class Tile extends javax.swing.JPanel {
 		Background.setIcon(new javax.swing.ImageIcon(getClass().getResource("/tikal_dev/FullBlockSM_2B.png")));
 	}
 	
+	public void setExplorestext(int index,int val){
+		if(this.tileData.GetExplorers(index) == 0){
+			P[index].setText("");
+		}
+		else{
+			P[index].setText(String.valueOf(this.tileData.GetExplorers(index)));
+		}
+	}
+	
 	
 	//Class Component Variables
     private javax.swing.JLabel Background;
@@ -283,6 +287,7 @@ public class Tile extends javax.swing.JPanel {
     private javax.swing.JLabel RBottom;
     private javax.swing.JLabel RTop;
     private javax.swing.JLabel Top;
-    
+    private javax.swing.JLabel[] P;
+
     
 }
