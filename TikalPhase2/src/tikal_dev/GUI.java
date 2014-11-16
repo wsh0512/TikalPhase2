@@ -489,8 +489,8 @@ public class GUI
 			public void MoveExplorer(int cost){
 				
 				if (_move.getCurrentPlayer().getName()=="P1"){
-					_move.getTileClick1().tileData.SetExplorer( 0 , (_move.getTileClick1().tileData.GetExplorers(0)-1));
-					_move.getTileClick1().tileData.SetExplorer( 0 , (_move.getTileClick1().tileData.GetExplorers(0)+1));
+					_move.getTileClick1().tileData.SetExplorer( 1 , (_move.getTileClick1().tileData.GetExplorers(1)-1));
+					_move.getTileClick1().tileData.SetExplorer( 1 , (_move.getTileClick1().tileData.GetExplorers(1)+1));
 					_move.getCurrentPlayer().setActionPoints(_move.getCurrentPlayer().getActionPoints()-cost);
 					_move.reset();
 					_menu.RefreshStats();
